@@ -70,9 +70,6 @@ var Game = (function($) {
 
   TicTacToe.prototype.mark = function(x, y) {
     // X = -1 = false, O = 1 = true
-    console.log(x);
-    console.log(y);
-    console.log(this);
     this.board[y][x] = this.turn ? 1 : -1;
     if(this.checkWin()) {
       console.log('Win: ' + this.turn);
@@ -114,43 +111,67 @@ var Game = (function($) {
     this.currentGame = new TicTacToe(false);
   }
 
-  Game.prototype.start = function() {
-    var that = this;
-    var startingPlayer = that.currentGame.turn ? "#player1" : "#player2";
+  function setPlayerDisplay() {
+    var startingPlayer = this.currentGame.turn ? "#player1" : "#player2";
+    $('.players').removeClass('active');
     $(startingPlayer).addClass('active');
-    $('#board').after(createSplash(true));
-    $('.button').click(function(e){
-      e.preventDefault();
-      $('#start').remove();
-    });
+  }
+
+  function setSplashScreen(state) {
+    var truthy = (state == "begin") ? true : false;
+    var winner = this.currentGame.turn ? "owin.svg" : "xwin.svg";
+    var color = this.currentGame.turn ? "#FFA000" : "#3688C3";
+    $('.box').off();
+    $('.screen').remove();
+    $('#board').after(createSplash(truthy));
+    if(truthy) {
+      $('.button').click(function(e){
+        e.preventDefault();
+        $('#start').remove();
+      });
+    } else {
+      $('#finish').css({"background": color + " url(img/" + winner + ") no-repeat center 50%"})
+      $('#finish .button').click(function(e) {
+        e.preventDefault();
+        $('.box-filled-1').removeClass('box-filled-1');
+        $('.box-filled-2').removeClass('box-filled-2');
+        $('#finish').remove();
+        var game = new Game();
+        game.start();
+      });
+    }
+  }
+
+  Game.prototype.markDisplayBox = function(box) {
+    var markClass = this.currentGame.turn ? "box-filled-2" : "box-filled-1";
+    $(box).off();
+    $(box).addClass(markClass);
+  }
+
+  function clickSpace(that, x, y) {
+    var win = this.currentGame.mark(x,y);
+    var markBoxClass = this.currentGame.turn ? "box-filled-2" : "box-filled-1";
+    win ? setSplashScreen.call(this, "end") : this.markDisplayBox(that);
+    this.currentGame.turn = !this.currentGame.turn;
+    $('.players').toggleClass('active');
+  }
+
+  function setBoard() {
+    var that = this;
     $('.box').each(function(index) {
       var x = index % 3;
       var y = Math.floor(index / 3);
       $(this).click(function() {
-        var markBoxClass = that.currentGame.turn ? "box-filled-2" : "box-filled-1";
-        var win = that.currentGame.mark(x,y);
-        $(this).addClass(markBoxClass);
-        $(this).off();
-        if(win) {
-          $('.box').off();
-          $('#board').after(createSplash(false));
-          var winner = that.currentGame.turn ? "owin.svg" : "xwin.svg";
-          var color = that.currentGame.turn ? "#FFA000" : "#3688C3";
-          $('#finish').css({"background": color + " url(img/" + winner + ") no-repeat center 50%"})
-          $('#finish .button').click(function(e) {
-            e.preventDefault();
-            $('.box-filled-1').removeClass('box-filled-1');
-            $('.box-filled-2').removeClass('box-filled-2');
-            $('#finish').remove();
-            var game = new Game();
-            game.start();
-          })
-        } else {
-          that.currentGame.turn = !that.currentGame.turn;
-          $('.players').toggleClass('active');
-        }
+        clickSpace.call(that, this, x, y);
       });
     });
+  }
+
+  Game.prototype.start = function() {
+    var that = this;
+    setPlayerDisplay.call(this, true);
+    setSplashScreen.call(this, "begin");
+    setBoard.call(this);
   }
 
   return Game;
