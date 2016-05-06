@@ -121,6 +121,14 @@ var Game = (function($) {
       $(this).click(function() {
         clickSpace(game, this, x, y);
       });
+      $(this).mouseenter(function() {
+        var player = game.currentGame.turn ? "2" : "1";
+        $(this).addClass('box-filled-' + player);
+      });
+      $(this).mouseleave(function() {
+        var player = game.currentGame.turn ? "2" : "1";
+        $(this).removeClass('box-filled-' + player);
+      });
     });
 
   }
