@@ -1,20 +1,3 @@
-// <div class="screen screen-start" id="start">
-//   <header>
-//     <h1>Tic Tac Toe</h1>
-//     <a href="#" class="button">Start game</a>
-//   </header>
-// </div>
-//
-// <div class="screen screen-win" id="finish">
-//   <header>
-//     <h1>Tic Tac Toe</h1>
-//     <p class="message">Winner</p>
-//     <a href="#" class="button">New game</a>
-//   </header>
-// </div>
-//
-// style="background: green url(img/x.svg) no-repeat center; background-size: 25%;"
-
 var Game = (function($) {
   'use strict';
 
@@ -65,50 +48,23 @@ var Game = (function($) {
     if (diagonal1 || diagonal2) {
       win = true;
     }
+
+    if (!win) {
+      var draw = true;
+      for(var index = 0; index < that.board.length; index++) {
+        draw = (that.board[index].indexOf(0) == -1 && draw);
+      }
+
+      if(draw) { win = null; }
+    }
+
     return win;
   }
 
   TicTacToe.prototype.mark = function(x, y) {
     // X = -1 = false, O = 1 = true
     this.board[y][x] = this.turn ? 1 : -1;
-    if(this.checkWin()) {
-      console.log('Win: ' + this.turn);
-      return true;
-    } else {
-      console.log("It's player " + !this.turn + " turn!");
-      return false;
-    }
-  }
-
-  function createSplash(truthy) {
-    var className;
-    var id;
-    var message;
-    var button;
-    if(truthy) {
-      className = "screen-start";
-      id = "start";
-      message = "";
-      button = "Start game";
-    } else {
-      className = "screen-win";
-      id = "finish";
-      message = "<p class='message'>Winner</p>";
-      button = "New game";
-    }
-    // var classes = ;
-    var splash = $('<div></div>').attr({"class": "screen " + className, "id": id})
-                                 .html('<header></header>');
-    splash.children('header')
-          .append('<h1>Tic Tac Toe</h1>')
-          .append(message)
-          .append('<a href="#" class="button">' + button + '</a>');
-
-    return splash;
-  }
-
-  function Game() {
-    this.currentGame = new TicTacToe(false);
+    return this.checkWin();
   }
 
   function setPlayerDisplay() {
@@ -117,29 +73,67 @@ var Game = (function($) {
     $(startingPlayer).addClass('active');
   }
 
-  function setSplashScreen(state) {
-    var truthy = (state == "begin") ? true : false;
-    var winner = this.currentGame.turn ? "owin.svg" : "xwin.svg";
-    var color = this.currentGame.turn ? "#FFA000" : "#3688C3";
+  function setSplashScreen(thisGame, state) {
+
+    //var winnerClass = thisGame.currentGame.turn ? "screen-win-one" : "screen-win-two";
     $('.box').off();
     $('.screen').remove();
-    $('#board').after(createSplash(truthy));
-    if(truthy) {
+    $('#board').after(thisGame.createSplash(state));
+
+    if(state == "begin") {
+
       $('.button').click(function(e){
         e.preventDefault();
         $('#start').remove();
       });
+
     } else {
-      $('#finish').css({"background": color + " url(img/" + winner + ") no-repeat center 50%"})
-      $('#finish .button').click(function(e) {
+
+      $('.button').click(function(e) {
         e.preventDefault();
-        $('.box-filled-1').removeClass('box-filled-1');
-        $('.box-filled-2').removeClass('box-filled-2');
-        $('#finish').remove();
         var game = new Game();
         game.start();
       });
+
     }
+  }
+
+  function clickSpace(game, space, x, y) {
+    var win = game.currentGame.mark(x,y);
+    console.log(win); // win can be null for a draw, needs functionality
+    win ? setSplashScreen(game, "end") : game.markDisplayBox(space);
+    if(win == null) { setSplashScreen(game, "draw"); }
+    game.currentGame.turn = !game.currentGame.turn;
+    $('.players').toggleClass('active');
+  }
+
+  function setBoard(game) {
+
+    // Clear
+    $('.box-filled-1').removeClass('box-filled-1');
+    $('.box-filled-2').removeClass('box-filled-2');
+    $('#finish').remove();
+
+    // set
+    $('.box').each(function(index) {
+      var x = index % game.currentGame.board.length;
+      var y = Math.floor(index / game.currentGame.board.length);
+      $(this).click(function() {
+        clickSpace(game, this, x, y);
+      });
+    });
+
+  }
+
+  function Game() {
+    this.currentGame = new TicTacToe(false);
+  }
+
+  Game.prototype.start = function() {
+    var that = this;
+    setPlayerDisplay.call(this, true);
+    setSplashScreen(this, "begin");
+    setBoard(this);
   }
 
   Game.prototype.markDisplayBox = function(box) {
@@ -148,30 +142,31 @@ var Game = (function($) {
     $(box).addClass(markClass);
   }
 
-  function clickSpace(that, x, y) {
-    var win = this.currentGame.mark(x,y);
-    var markBoxClass = this.currentGame.turn ? "box-filled-2" : "box-filled-1";
-    win ? setSplashScreen.call(this, "end") : this.markDisplayBox(that);
-    this.currentGame.turn = !this.currentGame.turn;
-    $('.players').toggleClass('active');
-  }
+  Game.prototype.createSplash = function(state) {
 
-  function setBoard() {
-    var that = this;
-    $('.box').each(function(index) {
-      var x = index % 3;
-      var y = Math.floor(index / 3);
-      $(this).click(function() {
-        clickSpace.call(that, this, x, y);
-      });
-    });
-  }
+    var player;
+    var winOrTie;
+    if(state == "draw") {
+      player = state;
+      winOrTie = "Draw";
+    } else {
+      player = this.currentGame.turn ? "one" : "two";
+      winOrTie = "Winner";
+    }
 
-  Game.prototype.start = function() {
-    var that = this;
-    setPlayerDisplay.call(this, true);
-    setSplashScreen.call(this, "begin");
-    setBoard.call(this);
+    var className = (state == "begin") ? "screen-start" : "screen-win-" + player;
+    var id = (state == "begin") ? "start" : "finish";
+    var message = (state == "begin") ? "" : "<p class='message'>" + winOrTie + "</p>";
+    var button = (state == "begin") ? "Start game" : "New game";
+
+    var splash = $('<div></div>').attr({"class": "screen " + className, "id": id})
+                                 .html('<header></header>');
+    splash.children('header')
+          .append('<h1>Tic Tac Toe</h1>')
+          .append(message)
+          .append('<a href="#" class="button">' + button + '</a>');
+
+    return splash;
   }
 
   return Game;

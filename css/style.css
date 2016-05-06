@@ -50,12 +50,18 @@ h1 {
       color: #54D17A; }
     .screen-start h1 + .button {
       margin-top: 5em; }
-  .screen-win p {
+  .screen-win p,
+  .screen-win-one p,
+  .screen-win-two p,
+  .screen-win-draw p {
     font-size: 6em;
     font-weight: 700;
     color: #fff;
     position: relative; }
-    .screen-win p:before {
+    .screen-win p:before,
+    .screen-win-one p:before,
+    .screen-win-two p:before,
+    .screen-win-draw p:before {
       position: absolute;
       left: 0;
       right: 0;
