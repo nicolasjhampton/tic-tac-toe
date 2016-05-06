@@ -143,3 +143,7 @@ h1 {
     .boxes .box-filled-1 {
       background-color: #3688C3;
       background-image: url(../img/x.svg); }
+    .boxes .box-over-2 {
+      background-image: url(../img/o.svg); }
+    .boxes .box-over-1 {
+      background-image: url(../img/x.svg); }

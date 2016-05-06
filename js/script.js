@@ -123,11 +123,11 @@ var Game = (function($) {
       });
       $(this).mouseenter(function() {
         var player = game.currentGame.turn ? "2" : "1";
-        $(this).addClass('box-filled-' + player);
+        $(this).addClass('box-over-' + player);
       });
       $(this).mouseleave(function() {
         var player = game.currentGame.turn ? "2" : "1";
-        $(this).removeClass('box-filled-' + player);
+        $(this).removeClass('box-over-' + player);
       });
     });
 
@@ -156,7 +156,7 @@ var Game = (function($) {
     var winOrTie;
     if(state == "draw") {
       player = state;
-      winOrTie = "Draw";
+      winOrTie = "It's a tie!";
     } else {
       player = this.currentGame.turn ? "one" : "two";
       winOrTie = "Winner";
