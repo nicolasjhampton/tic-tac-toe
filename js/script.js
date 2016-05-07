@@ -1,153 +1,105 @@
-var Game = (function($) {
+var Game = (function($, Cartridge) {
   'use strict';
 
-  function TicTacToe(starter) {
-    // (0,0) | (1,0) | (2,0)
-    // (0,1) | (1,1) | (2,1)
-    // (0,2) | (1,2) | (2,2)
-    this.turn = starter;
-    this.board = [
-      [0, 0, 0],
-      [0, 0, 0],
-      [0, 0, 0]
-    ];
+  /**
+   * Helper Function
+   * Clears game display of all moves and splash screens
+   *
+   */
+  function resetDisplay() {
+    $('.box').off();
+    $('.screen').remove();
+    $('.box').removeClass('box-over-1');
+    $('.box').removeClass('box-over-2');
+    $('.box-filled-1').removeClass('box-filled-1');
+    $('.box-filled-2').removeClass('box-filled-2');
   }
 
-  TicTacToe.prototype.checkWin = function() {
-    var that = this;
-    var win = false;
-    var playerMark = that.turn ? 1 : -1;
-
-    that.board.map(function(yRow, index) { // check horizontal wins
-      if (!yRow.includes(-playerMark) && !yRow.includes(0)) { // If none of opponents marks are present
-        win = true;
-        return false; // mark a win and break the map
-      }
-    });
-
-    that.board[0].map(function(throwAway, index, self) { // Check vertical wins
-      if(self[index] == playerMark &&
-         that.board[1][index] == playerMark &&
-         that.board[2][index] == playerMark) {
-        win = true;
-        return false; // mark a win and break the map
-      }
-    });
-
-    var diagonal1 = true;
-    for(var index = 0; index < that.board.length; index++) {
-      diagonal1 = (that.board[index][index] == playerMark && diagonal1);
-    }
-
-    var diagonal2 = true;
-    for(var index = 0; index < that.board.length; index++) {
-      var xedni = that.board.length - index - 1;
-      diagonal2 = (that.board[index][xedni] == playerMark && diagonal2);
-    }
-
-    if (diagonal1 || diagonal2) {
-      win = true;
-    }
-
-    if (!win) {
-      var draw = true;
-      for(var index = 0; index < that.board.length; index++) {
-        draw = (that.board[index].indexOf(0) == -1 && draw);
-      }
-
-      if(draw) { win = null; }
-    }
-
-    return win;
-  }
-
-  TicTacToe.prototype.mark = function(x, y) {
-    // X = -1 = false, O = 1 = true
-    this.board[y][x] = this.turn ? 1 : -1;
-    return this.checkWin();
-  }
-
-  function setPlayerDisplay() {
-    var startingPlayer = this.currentGame.turn ? "#player1" : "#player2";
+  function setPlayerDisplay(game) {
+    var startingPlayer = game.currentGame.turn ? "#player1" : "#player2";
     $('.players').removeClass('active');
     $(startingPlayer).addClass('active');
   }
 
-  function setSplashScreen(thisGame, state) {
+  Game.prototype.setSplashScreen = function(state) {
+    var that = this;
 
-    //var winnerClass = thisGame.currentGame.turn ? "screen-win-one" : "screen-win-two";
-    $('.box').off();
-    $('.screen').remove();
-    $('#board').after(thisGame.createSplash(state));
+    resetDisplay();
+
+    $('#board').after(that.createSplash(state));
 
     if(state == "begin") {
 
       $('.button').click(function(e){
-        e.preventDefault();
         $('#start').remove();
       });
 
     } else {
 
       $('.button').click(function(e) {
-        e.preventDefault();
-        var game = new Game();
-        game.start();
+        that.currentGame = new Cartridge();
+        that.start();
       });
 
     }
   }
 
-  function clickSpace(game, space, x, y) {
-    var win = game.currentGame.mark(x,y);
-    console.log(win); // win can be null for a draw, needs functionality
-    win ? setSplashScreen(game, "end") : game.markDisplayBox(space);
-    if(win == null) { setSplashScreen(game, "draw"); }
-    game.currentGame.turn = !game.currentGame.turn;
-    $('.players').toggleClass('active');
-  }
 
-  function setBoard(game) {
 
-    // Clear
-    $('.box-filled-1').removeClass('box-filled-1');
-    $('.box-filled-2').removeClass('box-filled-2');
-    $('#finish').remove();
-
-    // set
-    $('.box').each(function(index) {
-      var x = index % game.currentGame.board.length;
-      var y = Math.floor(index / game.currentGame.board.length);
-      $(this).click(function() {
-        clickSpace(game, this, x, y);
-      });
-      $(this).mouseenter(function() {
-        var player = game.currentGame.turn ? "2" : "1";
-        $(this).addClass('box-over-' + player);
-      });
-      $(this).mouseleave(function() {
-        var player = game.currentGame.turn ? "2" : "1";
-        $(this).removeClass('box-over-' + player);
-      });
-    });
-
-  }
-
-  function Game() {
-    this.currentGame = new TicTacToe(false);
+  function Game(Cartridge) {
+    this.currentGame = new Cartridge();
   }
 
   Game.prototype.start = function() {
     var that = this;
-    setPlayerDisplay.call(this, true);
-    setSplashScreen(this, "begin");
-    setBoard(this);
+    setPlayerDisplay(this);
+    this.setSplashScreen("begin");
+    this.setBoard(this);
   }
 
-  Game.prototype.markDisplayBox = function(box) {
+  Game.prototype.setBoard = function(game) {
+    var that = this;
+
+    $('.box').each(function(index) {
+
+      var coord = that.currentGame.calcPosition(index);
+
+      $(this).click(function() {
+        that.clickSpace(this, coord);
+      });
+
+      $(this).hover(function() {
+        that.setHoverOver(this);
+      });
+    });
+  }
+
+  Game.prototype.markSpace = function(box) {
     var markClass = this.currentGame.turn ? "box-filled-2" : "box-filled-1";
     $(box).off();
     $(box).addClass(markClass);
+  }
+
+  Game.prototype.clickSpace = function(space, coord) {
+    var continueGame = this.currentGame.move(coord.x, coord.y);
+    if(continueGame) {
+      this.markSpace(space);
+    } else if (!continueGame) {
+      continueGame == null ? this.setSplashScreen("draw") : this.setSplashScreen("end");
+    }
+    this.currentGame.turn = !this.currentGame.turn;
+    $('.players').toggleClass('active');
+  }
+
+  /**
+   * Sets the hover event for our visual game spaces
+   *
+   * @param DOM element that represents a space on the game board
+   *
+   */
+  Game.prototype.setHoverOver = function(space) {
+    var player = this.currentGame.turn ? "2" : "1";
+    $(space).toggleClass('box-over-' + player);
   }
 
   Game.prototype.createSplash = function(state) {

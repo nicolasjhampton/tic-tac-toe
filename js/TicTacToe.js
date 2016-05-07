@@ -1,94 +1,8 @@
+var TicTacToe = (function() {
+'use strict';
 
-
-// Test cases
-// [
-//   [1, 1, 1],
-//   [0, 0, 0],
-//   [0, 0, 0]
-// ];
-//
-// [
-//   [1, 0, 0],
-//   [0, 1, 0],
-//   [0, 0, 1]
-// ];
-//
-// [
-//   [1, 0, 0],
-//   [1, 0, 0],
-//   [1, 0, 0]
-// ];
-
-// this.board[0].includes(1) === -1
-// this.board[1].includes(1) === -1
-// this.board[2].includes(1) === -1
-// this.board[0][0] === this.board[1][0] === this.board[2][0] === playerMark
-// this.board[0][1] === this.board[1][1] === this.board[2][1] === playerMark
-// this.board[0][2] === this.board[1][2] === this.board[2][2] === playerMark
-
-// // check diagonal wins
-// if(that.board[0][0] == playerMark &&
-//    that.board[1][1] == playerMark &&
-//    that.board[2][2] == playerMark) {
-//   win = true;
-// };
-//
-// if(that.board[2][0] == playerMark &&
-//    that.board[1][1] == playerMark &&
-//    that.board[0][2] == playerMark) {
-//   win = true
-// }
-//
-// console.log({
-//   "name": "horizontal",
-//   "index": index,
-//   "outcome": (yRow.includes(-playerMark)),
-//   "yRow": yRow,
-//   "playerMark": playerMark
-// });
-//
-// console.log({
-//   "name": "vertical",
-//   "index": index,
-//   "outcome": (self[index] == playerMark &&
-//      that.board[1][index] == playerMark &&
-//      that.board[2][index] == playerMark),
-//   "first": self[index],
-//   "second": that.board[1][index],
-//   "third": that.board[2][index],
-//   "mark": playerMark,
-//   "this": that
-// });
-//
-// console.log({
-//   "name": "diagonal 1",
-//   "outcome": (that.board[0][0] == playerMark &&
-//               that.board[1][1] == playerMark &&
-//               that.board[2][2] == playerMark),
-//   "first": that.board[0][0],
-//   "second": that.board[1][1],
-//   "third": that.board[2][2],
-//   "mark": playerMark,
-//   "this": that
-// });
-//
-// console.log({
-//   "name": "diagonal 2",
-//   "outcome": (that.board[2][0] == playerMark &&
-//               that.board[1][1] == playerMark &&
-//               that.board[0][2] == playerMark),
-//   "first": that.board[2][0],
-//   "second": that.board[1][1],
-//   "third": that.board[0][2],
-//   "mark": playerMark,
-//   "this": that
-// });
-
-function TicTacToe(starter) {
-  // (0,0) | (1,0) | (2,0)
-  // (0,1) | (1,1) | (2,1)
-  // (0,2) | (1,2) | (2,2)
-  this.turn = starter;
+function TicTacToe() {
+  this.turn = false;
   this.board = [
     [0, 0, 0],
     [0, 0, 0],
@@ -96,48 +10,108 @@ function TicTacToe(starter) {
   ];
 }
 
-TicTacToe.prototype.checkWin = function() {
-  var playerMark = this.turn ? 1 : -1;
-  var win = false;
-  this.board.map(function(yRow, index) { // check horizontal wins
-    if (!yRow.includes(-playerMark) && !yRow.includes(0)) { // If none of opponents marks are present
-      win = true;
-      return false; // mark a win and break the map
-    }
-  });
 
-  // Check vertical wins
-  var that = this;
-  this.board[0].map(function(throwAway, index, self){
-    if(self[index] == playerMark &&
-       that.board[1][index] == playerMark &&
-       that.board[2][index] == playerMark) {
-      win = true;
-      return false;// mark a win and break the map
-    }
-  });
-
-  var diagonal1 = true;
-  for(var index = 0; index < that.board.length; index++) {
-    diagonal1 = (that.board[index][index] == playerMark && diagonal1);
+/**
+ * Tests a space for the presence of a player
+ *
+ * @param player: Integer - either 1 = O or -1 = X
+ *        board: Array - either one or two dimensional square array
+ *        coordinates: Integers - either (x) or (y, x)
+ *
+ * @returns boolean: Is the player in the space?
+ *
+ */
+var testSpace = function(player, board, coordinates) {
+  if(arguments.length == 3) {
+    return (arguments[0] == arguments[1][arguments[2]]);
+  } else {
+    return (arguments[0] == arguments[1][arguments[2]][arguments[3]]);
   }
-
-  var diagonal2 = true;
-  for(var index = 0; index < that.board.length; index++) {
-    var xedni = that.board.length - index - 1;
-    diagonal2 = (that.board[index][xedni] == playerMark && diagonal2);
-  }
-
-  if (diagonal1 || diagonal2) {
-    win = true;
-  }
-
-  return win;
 }
 
-TicTacToe.prototype.mark = function(x, y) {
+
+/**
+ * Tests the game for win status
+ *
+ * @returns boolean: Does the game continue? Returns
+ *                   false for a win. Null is draw.
+ *
+ */
+TicTacToe.prototype.checkWin = function() {
+  var that = this;
+  var noWin = false;
+  var playerMark = that.turn ? 1 : -1;
+
+  // returns true if no win found
+  var horizontal = (that.board.every(function(yRow) {
+    return (yRow.includes(-playerMark) || yRow.includes(0));
+  }));
+
+  // returns true if no win found
+  var vertical = that.board.every(function(current, index, self) {
+    return !(self.every(function(current2, index2, self2) {
+      return testSpace(playerMark, self2, index2, index); // (self2[index2][index] == playerMark);
+    }));
+  });
+
+  // returns true if no win found
+  var diagonal1 = !(that.board.every(function(current, index, self) {
+    return testSpace(playerMark, current, index); //(current[index] == playerMark);
+  }));
+
+  // returns true if no win found
+  var diagonal2 = !(that.board.every(function(current, index, self) {
+    var xedni = current.length - index - 1;
+    return testSpace(playerMark, current, xedni); //(current[xedni] == playerMark);
+  }));
+
+  noWin = (horizontal && vertical && diagonal1 && diagonal2);
+
+  if (noWin) {
+
+    var draw = that.board.every(function(current, index) {
+      return (current.indexOf(0) == -1);
+    });
+
+    noWin = draw ? null : noWin;
+  }
+
+  return noWin;
+}
+
+
+/**
+ * Makes a game move
+ *
+ * @param  x: Integer - X coordinate in grid system
+ *         y: Integer - Y coordinate in grid system
+ *
+ * @returns Boolean: Is another move allowed?
+ *          False returned for win, null for a draw
+ *
+ */
+TicTacToe.prototype.move = function(x, y) {
   // X = -1 = false, O = 1 = true
   this.board[y][x] = this.turn ? 1 : -1;
-  this.turn = !this.turn;
-  return this.turn;
+  return this.checkWin();
 }
+
+
+/**
+ * Translates the DOM element's index in the jquery array
+ * into a coordinate position in the game logic
+ *
+ * @param Integer index of jquery's spaces array
+ *
+ * @returns coordinate object { x, y }
+ *
+ */
+ TicTacToe.prototype.calcPosition = function(index) {
+   var x = index % this.board.length;
+   var y = Math.floor(index / this.board.length);
+   return { "x": x, "y": y };
+ }
+
+ return TicTacToe;
+
+ })();
