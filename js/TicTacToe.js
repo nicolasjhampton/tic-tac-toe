@@ -39,7 +39,7 @@ var testSpace = function(player, board, coordinates) {
  */
 TicTacToe.prototype.checkWin = function() {
   var that = this;
-  var noWin = false;
+  var noWin = true;
   var playerMark = that.turn ? 1 : -1;
 
   // returns true if no win found
