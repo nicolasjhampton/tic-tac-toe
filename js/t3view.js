@@ -6,8 +6,7 @@ var T3view = (function($, window, document) {
       "hover": "-over-",
       "marked": "-filled-",
       "board": {
-        "id": "board"
-      }
+        "id": "board" },
       "begin": {
         "id": "start",
         "class": "screen-start"},
@@ -44,13 +43,6 @@ var T3view = (function($, window, document) {
       }
     }
 
-
-    function T3view(config) {
-      if(!config) { config = {}; }
-      this.host = $.extend({}, defaultSettings, config);
-    }
-
-
     /**
      * Helper function for current player class suffix
      *
@@ -63,30 +55,10 @@ var T3view = (function($, window, document) {
       return turn ? 1 : 2;
     }
 
-    /**
-     * Sets the hover event for our visual game spaces
-     *
-     * @param space: DOM element - represents a space on the game board
-     *        turn: Boolean - true = Player1, false = Player2
-     *
-     */
-    T3view.prototype.setHoverOver = function(space, turn) {
-      var player = getPlayer(turn);
-      $(space).toggleClass(this.host.space.class + this.host.hover + player);
-    }
 
-
-    /**
-     * Visually marks the game space on the DOM
-     *
-     * @param space: DOM element - represents a space on the game board
-     *        turn: Boolean - true = Player1, false = Player2
-     *
-     */
-    T3view.prototype.markSpace = function(space, turn) {
-      var player = getPlayer(turn);
-      $(space).off();
-      $(space).addClass(this.host.space.class + this.host.marked + player);
+    function T3view(config) {
+      if(!config) { config = {}; }
+      this.host = $.extend({}, defaultSettings, config);
     }
 
 
@@ -124,6 +96,33 @@ var T3view = (function($, window, document) {
 
 
     /**
+     * Sets the hover event for our visual game spaces
+     *
+     * @param space: DOM element - represents a space on the game board
+     *        turn: Boolean - true = Player1, false = Player2
+     *
+     */
+    T3view.prototype.setHoverOver = function(space, turn) {
+      var player = getPlayer(turn);
+      $(space).toggleClass(this.host.space.class + this.host.hover + player);
+    }
+
+
+    /**
+     * Visually marks the game space on the DOM
+     *
+     * @param space: DOM element - represents a space on the game board
+     *        turn: Boolean - true = Player1, false = Player2
+     *
+     */
+    T3view.prototype.markSpace = function(space, turn) {
+      var player = getPlayer(turn);
+      $(space).off();
+      $(space).addClass(this.host.space.class + this.host.marked + player);
+    }
+
+
+    /**
      * Highlights the correct player on display
      *
      */
@@ -133,7 +132,6 @@ var T3view = (function($, window, document) {
 
 
     /**
-     * Helper Function
      * Clears game display of all moves and splash screens
      *
      */
