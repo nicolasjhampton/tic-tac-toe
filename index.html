@@ -37,8 +37,8 @@
 	<script src="js/tictactoe.js"></script>
 	<script src="js/t3view.js"></script>
 	<script>
-		var game = new Game(TicTacToe, T3view);
-		game.start();
+		var game = new Game();
+		game.setCartridge(TicTacToe).setDisplay(T3view).start();
 	</script>
 </body>
 </html>

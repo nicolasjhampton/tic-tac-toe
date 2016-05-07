@@ -2,7 +2,7 @@ var TicTacToe = (function() {
 'use strict';
 
 function TicTacToe() {
-  this.turn = false;
+  this.turn = true;
   this.board = [
     [0, 0, 0],
     [0, 0, 0],

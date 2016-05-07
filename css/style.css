@@ -51,16 +51,16 @@ h1 {
     .screen-start h1 + .button {
       margin-top: 5em; }
   .screen-win p,
-  .screen-win-one p,
-  .screen-win-two p,
+  .screen-win-1 p,
+  .screen-win-2 p,
   .screen-win-draw p {
     font-size: 6em;
     font-weight: 700;
     color: #fff;
     position: relative; }
     .screen-win p:before,
-    .screen-win-one p:before,
-    .screen-win-two p:before,
+    .screen-win-1 p:before,
+    .screen-win-2 p:before,
     .screen-win-draw p:before {
       position: absolute;
       left: 0;
@@ -72,18 +72,18 @@ h1 {
       z-index: -1; }
   .screen-win-draw {
     background: #54D17A; }
-  .screen-win-one {
+  .screen-win-1 {
     background: #FFA000; }
-    .screen-win-one .button {
+    .screen-win-1 .button {
       color: #3688C3; }
-    .screen-win-one p:before {
+    .screen-win-1 p:before {
       content: "o";
       top: 1.75rem; }
-  .screen-win-two {
+  .screen-win-2 {
     background: #3688C3; }
-    .screen-win-two .button {
+    .screen-win-2 .button {
       color: #FFA000; }
-    .screen-win-two p:before {
+    .screen-win-2 p:before {
       content: "×";
       top: 4.5rem; }
 
@@ -137,13 +137,13 @@ h1 {
     background-position: center center;}
     .boxes .box:nth-child(3n) {
       margin-right: 0; }
-    .boxes .box-filled-2 {
+    .boxes .box-filled-1 {
       background-color: #FFA000;
       background-image: url(../img/o.svg); }
-    .boxes .box-filled-1 {
+    .boxes .box-filled-2 {
       background-color: #3688C3;
       background-image: url(../img/x.svg); }
-    .boxes .box-over-2 {
-      background-image: url(../img/o.svg); }
     .boxes .box-over-1 {
+      background-image: url(../img/o.svg); }
+    .boxes .box-over-2 {
       background-image: url(../img/x.svg); }

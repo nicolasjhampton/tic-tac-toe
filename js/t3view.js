@@ -1,7 +1,66 @@
 var T3view = (function($, window, document) {
 
-    function T3view() {
+    var defaultSettings = {
+      "space": {
+        "class": "box" },
+      "hover": "-over-",
+      "marked": "-filled-",
+      "board": {
+        "id": "board"
+      }
+      "begin": {
+        "id": "start",
+        "class": "screen-start"},
+      "end": {
+        "id": "finish"},
+      "win": {
+        "message": "Winner",
+        "class": "screen-win-" },
+      "draw": {
+        "message": "It's a tie!",
+        "class": "draw" },
+      "message" : {
+        "startTag": "<p class='message'>",
+        "endTag": "</p>" },
+      "button": {
+        "class": "button",
+        "start": "Start game",
+        "new": "New game",
+        "startTag": "<a href='#' class='button'>",
+        "endTag": "</a>" },
+      "splash": {
+        "container": "div",
+        "textbox": "header",
+        "class": "screen" },
+      "title": {
+        "element": "h1",
+        "text": "Tic Tac Toe" },
+      "players": {
+        "class": "players",
+        "ids": [
+          "#player1",
+          "#player2"
+        ]
+      }
+    }
 
+
+    function T3view(config) {
+      if(!config) { config = {}; }
+      this.host = $.extend({}, defaultSettings, config);
+    }
+
+
+    /**
+     * Helper function for current player class suffix
+     *
+     * @param turn: Boolean - true = Player1, false = Player2
+     *
+     *
+     *
+     */
+    var getPlayer = function(turn) {
+      return turn ? 1 : 2;
     }
 
     /**
@@ -12,8 +71,8 @@ var T3view = (function($, window, document) {
      *
      */
     T3view.prototype.setHoverOver = function(space, turn) {
-      var player = turn ? "2" : "1";
-      $(space).toggleClass('box-over-' + player);
+      var player = getPlayer(turn);
+      $(space).toggleClass(this.host.space.class + this.host.hover + player);
     }
 
 
@@ -25,37 +84,40 @@ var T3view = (function($, window, document) {
      *
      */
     T3view.prototype.markSpace = function(space, turn) {
-      var markClass = turn ? "box-filled-2" : "box-filled-1";
+      var player = getPlayer(turn);
       $(space).off();
-      $(space).addClass(markClass);
+      $(space).addClass(this.host.space.class + this.host.marked + player);
     }
 
 
     /**
      * Factory method for beginning and ending splash screens
      *
-     * @param state: String - "begin", "end", or "draw"
+     * @param state: Boolean - true = "begin", false = "end", null = "draw"
      *        turn: Boolean - true = Player1, false = Player 2
      *
      * @returns DOM element
      *
      */
     T3view.prototype.createSplash = function(state, turn) {
-      var winOrTie = state == "draw" ? "It's a tie!" : "Winner";
-      var player = turn ? "one" : "two";
-      if(state == "draw") { player = "draw"; }
 
-      var className = (state == "begin") ? "screen-start" : "screen-win-" + player;
-      var id = (state == "begin") ? "start" : "finish";
-      var message = (state == "begin") ? "" : "<p class='message'>" + winOrTie + "</p>";
-      var button = (state == "begin") ? "Start game" : "New game";
+      var winOrTie = state == null ? this.host.draw.message : this.host.win.message;
 
-      var splash = $('<div></div>').attr({"class": "screen " + className, "id": id})
-                                   .html('<header></header>');
-      splash.children('header')
-            .append('<h1>Tic Tac Toe</h1>')
+      var player = state == null ? this.host.draw.class : getPlayer(turn);
+      var className = state ? this.host.begin.class : this.host.win.class + player;
+      var id = state ? this.host.begin.id : this.host.end.id;
+      var message = state ? "" : this.host.message.startTag + winOrTie + this.host.message.endTag;
+      var button = state ? this.host.button.start : this.host.button.new;
+
+      var splash = $('<' + this.host.splash.container + '></'+ this.host.splash.container + '>')
+                    .attr({"class": this.host.splash.class + " " + className, "id": id})
+                    .html('<' + this.host.splash.textbox + '></'+ this.host.splash.textbox + '>');
+      splash.children(this.host.splash.textbox)
+            .append('<' + this.host.title.element + '>' +
+                          this.host.title.text +
+                    '</' + this.host.title.element + '>')
             .append(message)
-            .append('<a href="#" class="button">' + button + '</a>');
+            .append(this.host.button.startTag + button + this.host.button.endTag);
 
       return splash;
     }
@@ -66,7 +128,7 @@ var T3view = (function($, window, document) {
      *
      */
     T3view.prototype.setPlayerDisplay = function() {
-      $('.players').toggleClass('active');
+      $('.' + this.host.players.class).toggleClass('active');
     }
 
 
@@ -76,14 +138,18 @@ var T3view = (function($, window, document) {
      *
      */
     T3view.prototype.resetDisplay = function() {
-      $('.box').off();
-      $('.screen').remove();
-      $('.players').removeClass('active');
-      $('#player2').addClass('active');
-      $('.box').removeClass('box-over-1');
-      $('.box').removeClass('box-over-2');
-      $('.box-filled-1').removeClass('box-filled-1');
-      $('.box-filled-2').removeClass('box-filled-2');
+      $('.' + this.host.space.class).off();
+      $('.' + this.host.splash.class).remove();
+      $('.' + this.host.players.class).removeClass('active');
+      $(this.host.players.ids[0]).addClass('active');
+      $('.' + this.host.space.class)
+        .removeClass(this.host.space.class + this.host.hover + getPlayer(true));
+      $('.' + this.host.space.class)
+        .removeClass(this.host.space.class + this.host.hover + getPlayer(false));
+      $('.' + this.host.space.class) // + this.host.marked + getPlayer(true))
+        .removeClass(this.host.space.class + this.host.marked + getPlayer(true));
+      $('.' + this.host.space.class) // + this.host.marked + getPlayer(false))
+        .removeClass(this.host.space.class + this.host.marked + getPlayer(false));
     }
 
     return T3view;

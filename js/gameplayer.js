@@ -5,7 +5,6 @@ var Game = (function($, window, document) {
   /**
    * Constructor function
    *
-   * @param Cartridge: constructor function for a game model
    *
    * @implements @properties: turn
    *                          board
@@ -14,12 +13,37 @@ var Game = (function($, window, document) {
    *                       move
    *
    */
-  function Game(Cartridge, View) {
-    this.Cartridge = Cartridge;
-    this.currentGame = new Cartridge();
-    this.view = new View();
+  function Game() {
+
   }
 
+  /**
+   * Set Cartridge for game initialization
+   *
+   * @param Cartridge class object
+   *
+   * @returns Game object
+   *
+   */
+  Game.prototype.setCartridge = function(Cartridge) {
+    this.Cartridge = Cartridge;
+    this.currentGame = new this.Cartridge();
+    return this;
+  }
+
+   /**
+    * Set Display for game initialization
+    *
+    * @param View class object
+    *
+    * @returns Game object
+    *
+    */
+   Game.prototype.setDisplay = function(Display) {
+     this.Display = Display;
+     this.view = new this.Display();
+     return this;
+   }
 
   /**
    * The start button for the game player
@@ -29,7 +53,7 @@ var Game = (function($, window, document) {
    */
   Game.prototype.start = function() {
     this.view.resetDisplay();
-    this.setSplashScreen("begin")
+    this.setSplashScreen(true)
         .setBoard();
 
     return this;
@@ -47,7 +71,8 @@ var Game = (function($, window, document) {
     if(continueGame) {
       this.view.markSpace(space, this.currentGame.turn);
     } else if (!continueGame) {
-      continueGame == null ? this.setSplashScreen("draw") : this.setSplashScreen("end");
+      this.setSplashScreen(continueGame);
+      //continueGame == null ? this.setSplashScreen("draw") : this.setSplashScreen("end");
     }
     this.currentGame.turn = !this.currentGame.turn;
     this.view.setPlayerDisplay();
@@ -57,7 +82,7 @@ var Game = (function($, window, document) {
   /**
    * Highlights the correct player
    *
-   * @param state: String - "begin", "end", or "draw"
+   * @param state: Boolean - true = "begin", false = "end", null = "draw"
    *
    * @returns Game object
    *
@@ -65,14 +90,15 @@ var Game = (function($, window, document) {
   Game.prototype.setSplashScreen = function(state) {
     var that = this;
 
-    $('#board').after(this.view.createSplash(state, this.currentGame.turn));
+    $('#' + this.view.host.board.id)
+      .after(this.view.createSplash(state, this.currentGame.turn));
 
-    if(state == "begin") {
-      $('.button').click(function(e){
+    if(state) {
+      $('.' + this.view.host.button.class).click(function(e){
         $('#start').remove();
       });
     } else {
-      $('.button').click(function(e) {
+      $('.' + this.view.host.button.class).click(function(e) {
         that.currentGame = new that.Cartridge();
         that.start();
       });
@@ -89,7 +115,7 @@ var Game = (function($, window, document) {
    */
   Game.prototype.setBoard = function() {
     var that = this;
-    $('.box').each(function(index) {
+    $('.' + this.view.host.space.class).each(function(index) {
       var coord = that.currentGame.calcPosition(index);
       $(this).click(function() {
         that.clickSpace(this, coord);
