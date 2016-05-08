@@ -31,6 +31,25 @@ var testSpace = function(player, board, coordinates) {
 
 
 /**
+ * Recursively tests a line that runs across arrays for a win
+ *
+ * @param board: Array - either one or two dimensional square array
+ *        player: Integer - either 1 = O or -1 = X
+ *        y and x: Integers - starting y and x coordinates
+ *        ystep: Integer - direction of movement
+ *               (1 = positive, -1 = negative, 0 = stationary)
+ *
+ * @returns boolean: true = win, false = noWin
+ *
+ */
+var testLine = function(board, player, y, yStep, x, xStep) {
+  return (board.length > y + 1) ?
+  testLine(board, player, y + yStep, yStep, x + xStep, xStep) && testSpace(player, board, y, x):
+  testSpace(player, board, y, x);
+}
+
+
+/**
  * Tests the game for win status
  *
  * @returns boolean: Does the game continue? Returns
@@ -43,38 +62,27 @@ TicTacToe.prototype.checkWin = function() {
   var playerMark = that.turn ? 1 : -1;
 
   // returns true if no win found
-  var horizontal = (that.board.every(function(yRow) {
-    return (yRow.includes(-playerMark) || yRow.includes(0));
-  }));
-
-  // returns true if no win found
-  var vertical = that.board.every(function(current, index, self) {
-    return !(self.every(function(current2, index2, self2) {
-      return testSpace(playerMark, self2, index2, index); // (self2[index2][index] == playerMark);
-    }));
+  var horizontal = that.board.every(function(current) {
+    return (current.includes(-playerMark) || current.includes(0));
   });
 
   // returns true if no win found
-  var diagonal1 = !(that.board.every(function(current, index, self) {
-    return testSpace(playerMark, current, index); //(current[index] == playerMark);
-  }));
+  var vertical = that.board.every(function(current, index, self) {
+    return !testLine(self, playerMark, 0, 1, index, 0);
+  });
 
   // returns true if no win found
-  var diagonal2 = !(that.board.every(function(current, index, self) {
-    var xedni = current.length - index - 1;
-    return testSpace(playerMark, current, xedni); //(current[xedni] == playerMark);
-  }));
+  var diagonal1 = !testLine(that.board, playerMark, 0, 1, 0, 1);
 
-  noWin = (horizontal && vertical && diagonal1 && diagonal2);
+  // returns true if no win found
+  var diagonal2 = !testLine(that.board, playerMark, 0, 1, that.board.length - 1, -1);
 
-  if (noWin) {
+  // returns true if there's a draw
+  var draw = that.board.every(function(current, index) {
+    return (!current.includes(0));
+  });
 
-    var draw = that.board.every(function(current, index) {
-      return (current.indexOf(0) == -1);
-    });
-
-    noWin = draw ? null : noWin;
-  }
+  noWin = draw ? null : (horizontal && vertical && diagonal1 && diagonal2);
 
   return noWin;
 }
