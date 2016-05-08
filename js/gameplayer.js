@@ -25,9 +25,9 @@ var Game = (function($, window, document) {
    * @returns Game object
    *
    */
-  Game.prototype.setCartridge = function(Cartridge) {
-    this.Cartridge = Cartridge;
-    this.currentGame = new this.Cartridge();
+  Game.prototype.setModel = function(Model) {
+    this.Model = Model;
+    this.currentGame = new this.Model();
     return this;
   };
 
@@ -39,9 +39,9 @@ var Game = (function($, window, document) {
     * @returns Game object
     *
     */
-   Game.prototype.setDisplay = function(Display) {
-     this.Display = Display;
-     this.view = new this.Display();
+   Game.prototype.setHost = function(Host) {
+     this.Host = Host;
+     this.view = new this.Host();
      return this;
    };
 
@@ -98,7 +98,7 @@ var Game = (function($, window, document) {
       });
     } else {
       $('.' + this.view.host.button.class).click(function(e) {
-        that.currentGame = new that.Cartridge();
+        that.currentGame = new that.Model();
         that.start();
       });
     }
