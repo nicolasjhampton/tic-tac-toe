@@ -29,7 +29,7 @@ var Game = (function($, window, document) {
     this.Cartridge = Cartridge;
     this.currentGame = new this.Cartridge();
     return this;
-  }
+  };
 
    /**
     * Set Display for game initialization
@@ -43,7 +43,7 @@ var Game = (function($, window, document) {
      this.Display = Display;
      this.view = new this.Display();
      return this;
-   }
+   };
 
   /**
    * The start button for the game player
@@ -57,7 +57,7 @@ var Game = (function($, window, document) {
         .setBoard();
 
     return this;
-  }
+  };
 
 
   /**
@@ -70,13 +70,12 @@ var Game = (function($, window, document) {
     var continueGame = this.currentGame.move(coord.x, coord.y);
     if(continueGame) {
       this.view.markSpace(space, this.currentGame.turn);
-    } else if (!continueGame) {
+      this.currentGame.turn = !this.currentGame.turn;
+      this.view.setPlayerDisplay();
+    } else {
       this.setSplashScreen(continueGame);
-      //continueGame == null ? this.setSplashScreen("draw") : this.setSplashScreen("end");
     }
-    this.currentGame.turn = !this.currentGame.turn;
-    this.view.setPlayerDisplay();
-  }
+  };
 
 
   /**
@@ -104,7 +103,7 @@ var Game = (function($, window, document) {
       });
     }
     return this;
-  }
+  };
 
 
   /**
@@ -125,7 +124,7 @@ var Game = (function($, window, document) {
       });
     });
     return this;
-  }
+  };
 
   return Game;
 

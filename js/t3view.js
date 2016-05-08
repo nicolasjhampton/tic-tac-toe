@@ -41,7 +41,7 @@ var T3view = (function($, window, document) {
           "#player2"
         ]
       }
-    }
+    };
 
     /**
      * Helper function for current player class suffix
@@ -53,7 +53,7 @@ var T3view = (function($, window, document) {
      */
     var getPlayer = function(turn) {
       return turn ? 1 : 2;
-    }
+    };
 
 
     function T3view(config) {
@@ -73,9 +73,9 @@ var T3view = (function($, window, document) {
      */
     T3view.prototype.createSplash = function(state, turn) {
 
-      var winOrTie = state == null ? this.host.draw.message : this.host.win.message;
+      var winOrTie = state === null ? this.host.draw.message : this.host.win.message;
 
-      var player = state == null ? this.host.draw.class : getPlayer(turn);
+      var player = state === null ? this.host.draw.class : getPlayer(turn);
       var className = state ? this.host.begin.class : this.host.win.class + player;
       var id = state ? this.host.begin.id : this.host.end.id;
       var message = state ? "" : this.host.message.startTag + winOrTie + this.host.message.endTag;
@@ -92,7 +92,7 @@ var T3view = (function($, window, document) {
             .append(this.host.button.startTag + button + this.host.button.endTag);
 
       return splash;
-    }
+    };
 
 
     /**
@@ -105,7 +105,7 @@ var T3view = (function($, window, document) {
     T3view.prototype.setHoverOver = function(space, turn) {
       var player = getPlayer(turn);
       $(space).toggleClass(this.host.space.class + this.host.hover + player);
-    }
+    };
 
 
     /**
@@ -119,7 +119,7 @@ var T3view = (function($, window, document) {
       var player = getPlayer(turn);
       $(space).off();
       $(space).addClass(this.host.space.class + this.host.marked + player);
-    }
+    };
 
 
     /**
@@ -128,7 +128,7 @@ var T3view = (function($, window, document) {
      */
     T3view.prototype.setPlayerDisplay = function() {
       $('.' + this.host.players.class).toggleClass('active');
-    }
+    };
 
 
     /**
@@ -148,7 +148,7 @@ var T3view = (function($, window, document) {
         .removeClass(this.host.space.class + this.host.marked + getPlayer(true));
       $('.' + this.host.space.class) // + this.host.marked + getPlayer(false))
         .removeClass(this.host.space.class + this.host.marked + getPlayer(false));
-    }
+    };
 
     return T3view;
 

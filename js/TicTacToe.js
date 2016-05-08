@@ -16,18 +16,14 @@ function TicTacToe() {
  *
  * @param player: Integer - either 1 = O or -1 = X
  *        board: Array - either one or two dimensional square array
- *        coordinates: Integers - either (x) or (y, x)
+ *        coordinates: Integers - (y, x)
  *
  * @returns boolean: Is the player in the space?
  *
  */
-var testSpace = function(player, board, coordinates) {
-  if(arguments.length == 3) {
-    return (arguments[0] == arguments[1][arguments[2]]);
-  } else {
-    return (arguments[0] == arguments[1][arguments[2]][arguments[3]]);
-  }
-}
+var testSpace = function(player, board, y, x) {
+  return player == board[y][x];
+};
 
 
 /**
@@ -46,7 +42,7 @@ var testLine = function(board, player, y, yStep, x, xStep) {
   return (board.length > y + 1) ?
   testLine(board, player, y + yStep, yStep, x + xStep, xStep) && testSpace(player, board, y, x):
   testSpace(player, board, y, x);
-}
+};
 
 
 /**
@@ -85,7 +81,7 @@ TicTacToe.prototype.checkWin = function() {
   noWin = draw ? null : (horizontal && vertical && diagonal1 && diagonal2);
 
   return noWin;
-}
+};
 
 
 /**
@@ -102,7 +98,7 @@ TicTacToe.prototype.move = function(x, y) {
   // X = -1 = false, O = 1 = true
   this.board[y][x] = this.turn ? 1 : -1;
   return this.checkWin();
-}
+};
 
 
 /**
@@ -118,7 +114,7 @@ TicTacToe.prototype.move = function(x, y) {
    var x = index % this.board.length;
    var y = Math.floor(index / this.board.length);
    return { "x": x, "y": y };
- }
+ };
 
  return TicTacToe;
 
