@@ -1,5 +1,6 @@
 var T3view = (function($, window, document) {
-
+  'use strict';
+  
     var defaultSettings = {
       "space": {
         "class": "box" },

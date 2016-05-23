@@ -40,8 +40,8 @@ var testSpace = function(player, board, y, x) {
  */
 var testLine = function(board, player, y, yStep, x, xStep) {
   return (board.length > y + 1) ?
-  testLine(board, player, y + yStep, yStep, x + xStep, xStep) && testSpace(player, board, y, x):
-  testSpace(player, board, y, x);
+    testLine(board, player, y + yStep, yStep, x + xStep, xStep) && testSpace(player, board, y, x):
+    testSpace(player, board, y, x);
 };
 
 
