@@ -12,38 +12,15 @@ var Game = (function($, window, document) {
    *                       checkWin
    *                       move
    *
+   * @param {Host} Host View class object
+   * @param {Model} Cartridge class object
+   *
    */
-  function Game() {
-
+  function Game(Host, Model) {
+    this.view = new Host();
+    this.currentGame = new Model();
   }
 
-  /**
-   * Set Cartridge for game initialization
-   *
-   * @param Cartridge class object
-   *
-   * @returns Game object
-   *
-   */
-  Game.prototype.setModel = function(Model) {
-    this.Model = Model;
-    this.currentGame = new this.Model();
-    return this;
-  };
-
-   /**
-    * Set Display for game initialization
-    *
-    * @param View class object
-    *
-    * @returns Game object
-    *
-    */
-   Game.prototype.setHost = function(Host) {
-     this.Host = Host;
-     this.view = new this.Host();
-     return this;
-   };
 
   /**
    * The start button for the game player
