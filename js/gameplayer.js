@@ -18,7 +18,8 @@ var Game = (function($, window, document) {
    */
   function Game(Host, Model) {
     this.view = new Host();
-    this.currentGame = new Model();
+    this.Model = Model;
+    this.currentGame = new this.Model();
   }
 
 
@@ -36,9 +37,24 @@ var Game = (function($, window, document) {
     return this;
   };
 
+  /**
+   * Testing method for minimax algorithm
+   *
+   * @returns {Array} checksums
+   *
+   */
+  Game.prototype.getComputerMove = function() {
+    return this.currentGame.getComputerMove();
+  };
+
+  // Game.prototype.getBoard = function() {
+  //   return this.currentGame.board;
+  // };
+
 
   /**
-   * The click event for our game spaces
+   * The click event for our game spaces. This is where we have to
+   * insert the computer player.
    *
    * @param space: DOM element - represents a space on the game board
    *
@@ -49,10 +65,26 @@ var Game = (function($, window, document) {
       this.view.markSpace(space, this.currentGame.turn);
       this.currentGame.turn = !this.currentGame.turn;
       this.view.setPlayerDisplay();
+      if(this.currentGame.isComputer) {
+        this.autoMove();
+      }
     } else {
       this.setSplashScreen(continueGame);
     }
   };
+
+  Game.prototype.autoMove = function() {
+    var moveYX = this.currentGame.getComputerMove();
+    // if(!moveYX) { this game is a tie }
+    var continueGame = this.currentGame.move(moveYX[1], moveYX[0]);
+    if(continueGame) {
+      this.view.markSpace((moveYX[0] * 3) + moveYX[1], this.currentGame.turn);
+      this.currentGame.turn = !this.currentGame.turn;
+      this.view.setPlayerDisplay();
+    } else {
+      this.setSplashScreen(continueGame);
+    }
+  }
 
 
   /**

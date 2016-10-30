@@ -1,6 +1,6 @@
 var T3view = (function($, window, document) {
   'use strict';
-  
+
     var defaultSettings = {
       "space": {
         "class": "box" },
@@ -118,6 +118,8 @@ var T3view = (function($, window, document) {
      */
     T3view.prototype.markSpace = function(space, turn) {
       var player = getPlayer(turn);
+      // accomodate AI
+      space = (typeof space == "number") ? $('.box').eq(space)[0] : space;
       $(space).off();
       $(space).addClass(this.host.space.class + this.host.marked + player);
     };
@@ -140,7 +142,7 @@ var T3view = (function($, window, document) {
       $('.' + this.host.space.class).off();
       $('.' + this.host.splash.class).remove();
       $('.' + this.host.players.class).removeClass('active');
-      $(this.host.players.ids[0]).addClass('active');
+      $(this.host.players.ids[1]).addClass('active');
       $('.' + this.host.space.class)
         .removeClass(this.host.space.class + this.host.hover + getPlayer(true));
       $('.' + this.host.space.class)
